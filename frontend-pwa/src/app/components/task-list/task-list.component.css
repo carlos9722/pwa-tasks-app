@@ -1,0 +1,36 @@
+.scroll-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+mat-list-item {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.task-title {
+  flex: 1;
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+
+.chip-synced {
+  background-color: #43a047 !important;
+  color: #fff !important;
+}
+
+.chip-pending {
+  background-color: #e53935 !important;
+  color: #fff !important;
+}
+
+mat-chip {
+  margin-left: 12px;
+  font-weight: bold;
+}

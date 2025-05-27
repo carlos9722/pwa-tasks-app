@@ -1,0 +1,8 @@
+<mat-toolbar color="primary">
+  <span>PWA Tareas Offline</span>
+</mat-toolbar>
+<div class="container">
+  <app-task-form (taskAdded)="reloadTasks()"></app-task-form>
+  <app-task-list #taskList></app-task-list>
+</div>
+

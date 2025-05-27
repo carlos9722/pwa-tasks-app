@@ -1,0 +1,11 @@
+<mat-card>
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>¿Qué tarea deseas registrar?</mat-label>
+      <input matInput formControlName="title" required>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!taskForm.valid">
+      <mat-icon>add</mat-icon> Agregar
+    </button>
+  </form>
+</mat-card>
