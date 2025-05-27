@@ -16,12 +16,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './app.component';
 import { TaskFormComponent } from './components/task-form/task-form.component';
 import { TaskListComponent } from './components/task-list/task-list.component';
+import { TaskItemComponent } from './components/task-list/task-item/task-item.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TaskFormComponent,
     TaskListComponent,
+    TaskItemComponent,
   ],
   imports: [
     BrowserModule,

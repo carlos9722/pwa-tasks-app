@@ -28,12 +28,25 @@ export class TaskService {
     return from(this.dbPromise.then(db => db.getAll('tasks')));
   }
 
+  updateLocalTasks(tasks: Task[]): Observable<any> {
+    return from(this.dbPromise).pipe(
+      switchMap(db =>
+        from(db.clear('tasks')).pipe(
+          switchMap(() =>
+            forkJoin(tasks.map(task => from(db.put('tasks', { ...task, synced: true }))))
+          )
+        )
+      )
+    );
+  }
+
   setTaskSynced(id: number): Observable<any> {
     return from(
       this.dbPromise.then(async db => {
         const task = await db.get('tasks', id);
         if (task) {
           task.synced = true;
+          task.completed = true;
           await db.put('tasks', task);
         }
       })
@@ -49,62 +62,30 @@ export class TaskService {
   }
 
   syncPendingTasks(): Observable<any> {
-    // Sincroniza tareas no sincronizadas con el backend
-    return from(this.dbPromise).pipe(
-      switchMap(db => from(db.getAll('tasks')).pipe(
-        map(tasks => tasks.filter((t: Task) => !t.synced)),
-        switchMap((unsynced: Task[]) => {
-          if (unsynced.length === 0) return of([]);
-          // Sincroniza las pendientes
-          return this.http.post<Task[]>(this.apiUrl + '/sync', unsynced).pipe(
-            switchMap((res) =>
-              // Marca todas como sincronizadas localmente
-              forkJoin(unsynced.map(task => this.setTaskSynced(task.id!)))
-            ),
-            catchError(err => {
-              // Manejo de error, no limpiar nada local aún
-              return throwError(() => err);
-            })
-          );
-        })
-      ))
-    );
-  }
-
-  clearAndLoadFromBackend(): Observable<any> {
-    // Descarga tareas del backend y sobrescribe el almacenamiento local
-    return this.getTasks().pipe(
-      switchMap((backendTasks: Task[]) =>
-        from(this.dbPromise).pipe(
-          switchMap(db =>
-            from(db.clear('tasks')).pipe(
-              switchMap(() =>
-                forkJoin(
-                  backendTasks.map(task =>
-                    from(db.put('tasks', { ...task, synced: true }))
-                  )
-                )
-              )
+  // Sincroniza tareas no sincronizadas con el backend
+  return from(this.dbPromise).pipe(
+    switchMap(db => from(db.getAll('tasks')).pipe(
+      map(tasks => tasks.filter((t: Task) => !t.synced)),
+      switchMap((unsynced: Task[]) => {
+        if (unsynced.length === 0) return of([]);
+        // Sincroniza cada tarea pendiente con un POST individual
+        return forkJoin(
+          unsynced.map(task =>
+            this.http.post<Task>(this.apiUrl, {
+              title: task.title,
+              completed: true
+            }).pipe(
+              switchMap(() => this.setTaskSynced(task.id!))
             )
           )
-        )
-      )
-    );
-  }
-
-  /***
-   * Inicializa y sincroniza tareas:
-   * 1. Si online, primero sincroniza pendientes.
-   * 2. Solo si fue exitoso, limpia y repuebla con backend.
-   */
-  initAndSyncTasks(): Observable<any> {
-    if (!navigator.onLine) return of(null); // Offline: no hacer nada
-    return this.syncPendingTasks().pipe(
-      switchMap(() => this.clearAndLoadFromBackend()),
-      catchError(err => {
-        // Si falla la sincronización, no limpiamos ni sobrescribimos local
-        return throwError(() => err);
+        );
       })
-    );
-  }
+    ))
+  );
+}
+
+deleteLocalTask(id: number): Observable<any> {
+  return from(this.dbPromise.then(db => db.delete('tasks', id)));
+}
+
 }

@@ -19,13 +19,4 @@ export class TasksService {
   findAll(): Promise<Task[]> {
     return this.taskRepo.find();
   }
-
-  async bulkUpsert(tasks: CreateTaskDto[]): Promise<Task[]> {
-    const results = [];
-    for (const t of tasks) {
-      const task = this.taskRepo.create(t);
-      results.push(await this.taskRepo.save(task));
-    }
-    return results;
-  }
 }

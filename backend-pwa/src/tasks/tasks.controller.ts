@@ -16,9 +16,4 @@ export class TasksController {
   create(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
     return this.tasksService.create(createTaskDto);
   }
-
-  @Post('sync')
-  bulkUpsert(@Body() tasks: CreateTaskDto[]): Promise<Task[]> {
-    return this.tasksService.bulkUpsert(tasks);
-  }
 }

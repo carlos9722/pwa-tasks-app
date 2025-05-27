@@ -24,12 +24,12 @@ export class TaskFormComponent {
 
  onSubmit() {
   if (this.taskForm.valid) {
-    const tarea = { title: this.taskForm.value.title };
+    const task = { title: this.taskForm.value.title, completed: true };
 
     if (navigator.onLine) {
-      this.taskService.createTask(tarea).subscribe({
+      this.taskService.createTask(task).subscribe({
         next: (res) => {
-          this.taskService.addTaskLocal({ ...res, synced: true }).subscribe(() => {
+          this.taskService.addTaskLocal({ ...res,completed: true,  synced: true }).subscribe(() => {
             this.snackBar.open('Tarea guardada en el backend', 'Cerrar', { duration: 2000 });
             this.taskForm.reset();
             this.taskAdded.emit();
@@ -37,7 +37,7 @@ export class TaskFormComponent {
         },
         error: () => {
           // Si falla el backend, guarda con synced: false
-          this.taskService.addTaskLocal({ ...tarea, synced: false }).subscribe(() => {
+          this.taskService.addTaskLocal({ ...task, completed: false, synced: false }).subscribe(() => {
             this.snackBar.open('Backend caído. Guardado localmente.', 'Cerrar', { duration: 2000 });
             this.taskForm.reset();
             this.taskAdded.emit();
@@ -46,7 +46,7 @@ export class TaskFormComponent {
       });
     } else {
       // Sin conexión: synced false
-      this.taskService.addTaskLocal({ ...tarea, synced: false }).subscribe(() => {
+      this.taskService.addTaskLocal({ ...task,completed: false, synced: false }).subscribe(() => {
         this.snackBar.open('Tarea guardada localmente (offline)', 'Cerrar', { duration: 2000 });
         this.taskForm.reset();
         this.taskAdded.emit();
@@ -54,7 +54,5 @@ export class TaskFormComponent {
     }
   }
 }
-
-
 
 }

@@ -1,0 +1,14 @@
+.chip-synced {
+  background-color: #43a047 !important;
+  color: #fff !important;
+}
+
+.chip-pending {
+  background-color: #e53935 !important;
+  color: #fff !important;
+}
+
+mat-chip {
+  margin-left: 12px;
+  font-weight: bold;
+}

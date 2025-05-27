@@ -1,0 +1,16 @@
+<mat-list-item>
+  <mat-icon mat-list-icon color="primary">assignment</mat-icon>
+  <span class="task-title">{{ task.title }}</span>
+  <span class="spacer"></span>
+  <mat-chip
+    [ngClass]="task.synced ? 'chip-synced' : 'chip-pending'"
+    selected>
+    {{ task.synced ? 'Sincronizado' : 'Pendiente' }}
+  </mat-chip>
+  <button *ngIf="!task.synced" mat-icon-button (click)="onSync()">
+    <mat-icon color="warn">refresh</mat-icon>
+  </button>
+  <button *ngIf="!task.synced" mat-icon-button (click)="onRemove()">
+    <mat-icon color="accent">delete</mat-icon>
+  </button>
+</mat-list-item>
